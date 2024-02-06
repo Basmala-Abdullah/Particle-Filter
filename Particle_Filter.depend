@@ -1,0 +1,30 @@
+# depslib dependency file v1.0
+1707225430 source:c:\users\dell\documents\codeblocks\particle_filter\helper_function.c
+	"helper_function.h"
+
+1707231423 c:\users\dell\documents\codeblocks\particle_filter\helper_function.h
+	<float.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+
+1707231180 source:c:\users\dell\documents\codeblocks\particle_filter\demo.c
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+
+1707231206 source:c:\users\dell\documents\codeblocks\particle_filter\particle.c
+	"Particle.h"
+
+1707230836 c:\users\dell\documents\codeblocks\particle_filter\particle.h
+	"helper_function.h"
+	"measurement.h"
+
+1707225871 c:\users\dell\documents\codeblocks\particle_filter\measurement.h
+
+1707230818 source:c:\users\dell\documents\codeblocks\particle_filter\main.c
+	<stdio.h>
+	<stdlib.h>
+	"Particle.h"
+

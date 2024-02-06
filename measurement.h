@@ -3,10 +3,11 @@
 
 #define NUM_MEASUREMENTS 30
 
-struct Measurement{
-    int x;
-    int y;
-};
+
+typedef struct Measurement {
+    double x;
+    double y;
+} Measurement;
 
 
 #endif /* MEASUREMENT_H_ */

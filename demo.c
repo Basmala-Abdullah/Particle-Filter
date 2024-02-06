@@ -1,4 +1,4 @@
-
+/*
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -184,3 +184,5 @@ void initialize_particles(Particle particles[NUM_PARTICLES]) {
         printf("Particle %d: x = %f, y = %f\n", i, particles[i].x, particles[i].y);
     }
 }}
+*/
+///////////////////

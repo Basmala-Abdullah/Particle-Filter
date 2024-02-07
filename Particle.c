@@ -6,23 +6,30 @@
  */
 
  #include "Particle.h"
+ #define BLE_RANGE 50
 
-
+//// Add a function to clamp values within a range
+//double clamp(double value, double min, double max) {
+//    if (value < min) return min;
+//    if (value > max) return max;
+//    return value;
+//}
 
 void initialize_particles(Particle particles[NUM_PARTICLES]) {
 
     double mean_x = 0; // Assuming the car is centered at origin
     double mean_y = 0; // Assuming the car is centered at origin
-    double stddev_x = 50; // Broader distribution across the car's width
-    double stddev_y = 50; // Broader distribution as device could be up to 50 meters away
+    double stddev_x = BLE_RANGE; // Broader distribution across the car's width
+    double stddev_y = BLE_RANGE; // Broader distribution as device could be up to 50 meters away
 
     double count = 0;
     for (int i = 0; i < NUM_PARTICLES; i++) {
-        // Generate particles around the center with normal distribution
-        particles[i].x = generate_normal_random(mean_x, stddev_x);
-        particles[i].y = generate_normal_random(mean_y, stddev_y);
-        particles[i].weight = 1.0 / NUM_PARTICLES; // Initialize weights evenly
+        do {
+            particles[i].x = generate_normal_random(mean_x, stddev_x);
+            particles[i].y = generate_normal_random(mean_y, stddev_y);
+        } while (fabs(particles[i].x) > BLE_RANGE || fabs(particles[i].y) > BLE_RANGE);
 
+        particles[i].weight = 1.0 / NUM_PARTICLES; // Initialize weights evenly
         particles[i].accelerationX =generate_normal_random(mean_x, stddev_x);
         particles[i].accelerationY =generate_normal_random(mean_x, stddev_y);
         particles[i].velocityX =0;
@@ -92,6 +99,8 @@ void prediction(Particle particles[NUM_PARTICLES]){
     double std_x = 1.5; //standard deviation for particle x value
     double std_y = 1.5; //standard deviation for particle y value
     double time =0.1; //time = 1 sec as we got the std_dev value based on human speed that is measured in seconds
+
+    //-----------------------Gaussian Random Acceleratioon-----------------------------------------
         for(int i=0; i<NUM_PARTICLES; ++i){
             Particle *p = &particles[i]; // get address of particle to update
 
@@ -116,7 +125,22 @@ void prediction(Particle particles[NUM_PARTICLES]){
             p->accelerationY = new_acc_y;
 
         }
-
+    //--------------------basic form of the Newtonian motion-------------------------
+//            for (int i = 0; i < NUM_PARTICLES; ++i) {
+//                    Particle *p = &particles[i];
+//
+//                    // Predict new state with added noise
+//                    p->accelerationX += generate_normal_random(0, std_x);
+//                    p->accelerationY += generate_normal_random(0, std_y);
+//                    p->velocityX += p->accelerationX * time;
+//                    p->velocityY += p->accelerationY * time;
+//                    p->x += p->velocityX * time + 0.5 * p->accelerationX * pow(time, 2);
+//                    p->y += p->velocityY * time + 0.5 * p->accelerationY * pow(time, 2);
+//
+//                    // Boundary check and clamp to BLE range
+//                    p->x = clamp(p->x, -BLE_RANGE, BLE_RANGE);
+//                    p->y = clamp(p->y, -BLE_RANGE, BLE_RANGE);
+//                }
 
 }
 

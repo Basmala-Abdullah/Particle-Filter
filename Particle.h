@@ -5,7 +5,7 @@
 #include "helper_function.h"
 #include "measurement.h"
 
-#define NUM_PARTICLES  100
+#define NUM_PARTICLES  500
 
 typedef struct Particle{
 

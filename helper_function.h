@@ -8,7 +8,7 @@
 #include <string.h>
 #include <math.h>
 
-#define NUM_ITERATIONS 3
+#define NUM_ITERATIONS 5
 
 double generate_normal_random(double mean, double stddev);
 

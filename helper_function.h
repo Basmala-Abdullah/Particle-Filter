@@ -9,7 +9,7 @@
 #include <math.h>
 #include <time.h>    
 
-#define NUM_ITERATIONS 5
+#define NUM_ITERATIONS 50
 
 double generate_normal_random(double mean, double stddev);
 

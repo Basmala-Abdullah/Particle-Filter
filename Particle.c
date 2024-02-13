@@ -15,13 +15,12 @@
 //    return value;
 //}
 
-void initialize_particles(Particle particles[NUM_PARTICLES]) {
+void initialize_particles(Particle particles[NUM_PARTICLES],int max_x,int min_x,int max_y,int min_y) {
 
-    double mean_x = 0; // Assuming the car is centered at origin
-    double mean_y = 0; // Assuming the car is centered at origin
-    double stddev_x = BLE_RANGE; // Broader distribution across the car's width
-    double stddev_y = BLE_RANGE; // Broader distribution as device could be up to 50 meters away
-
+    double mean_x = (max_x + min_x)/2; // spread particles in region of measurements (x)
+    double mean_y = (max_y + min_y)/2; // spread particles in region of measurements (y)
+    double stddev_x = (max_x - min_x)/4; // approximate equation of standard deviation value knowing min and max values (x)
+    double stddev_y = (max_y- min_y)/4; // approximate equation of standard deviation value knowing min and max values (y)
     double count = 0;
     for (int i = 0; i < NUM_PARTICLES; i++) {
         do {
@@ -30,8 +29,8 @@ void initialize_particles(Particle particles[NUM_PARTICLES]) {
         } while (fabs(particles[i].x) > BLE_RANGE || fabs(particles[i].y) > BLE_RANGE);
 
         particles[i].weight = 1.0 / NUM_PARTICLES; // Initialize weights evenly
-        particles[i].accelerationX =generate_normal_random(mean_x, stddev_x);
-        particles[i].accelerationY =generate_normal_random(mean_x, stddev_y);
+        particles[i].accelerationX =generate_normal_random(0, 1.5); //as the standard deviation value in prediction step
+        particles[i].accelerationY =generate_normal_random(0, 1.5); //as the standard deviation value in prediction step
         particles[i].velocityX =0;
         particles[i].velocityY =0;
 
@@ -49,8 +48,8 @@ void initialize_particles(Particle particles[NUM_PARTICLES]) {
 
 void update_particles(Particle particles[NUM_PARTICLES], Measurement measurements[NUM_MEASUREMENTS]){
 
-     double std_x = 0.2; //standard deviation for particle x value - Not sure
-     double std_y = 0.2; //standard deviation for particle y value - Not sure
+    //  double std_x = 0.2; //standard deviation for particle x value - Not sure
+    //  double std_y = 0.2; //standard deviation for particle y value - Not sure
      double weight_sum = 0.0; //used for weight normalizing
     double wt =1.0;
      for(int i=0; i<NUM_PARTICLES; i++){
@@ -71,7 +70,7 @@ void update_particles(Particle particles[NUM_PARTICLES], Measurement measurement
         printf("num=%f, denom = %f",numerator,denominator);*/
         double numerator =1;
         double denominator = sqrt(pow((nearestPointToParticle.x - particles[i].x), 2) + pow((nearestPointToParticle.y - particles[i].y), 2));
-        printf("num=%f, denom = %f",numerator,denominator);
+        //printf("num=%f, denom = %f",numerator,denominator);
         wt *= (numerator/denominator);
         p->weight = wt;
         weight_sum += wt;
@@ -91,7 +90,7 @@ void update_particles(Particle particles[NUM_PARTICLES], Measurement measurement
         total_weight+=particles[i].weight;
 
     }
-    printf("Total weight of particles: %f\n",total_weight);
+    //printf("Total weight of particles: %f\n",total_weight);
 }
 
 
@@ -196,7 +195,7 @@ void resample(Particle particles[NUM_PARTICLES]) {
         total_weight+=particles[i].weight;
 
     }
-    printf("Total weight of particles: %f\n",total_weight);
+    //printf("Total weight of particles: %f\n",total_weight);
 }
 
 

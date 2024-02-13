@@ -5,7 +5,7 @@
 #include "helper_function.h"
 #include "measurement.h"
 
-#define NUM_PARTICLES  500
+#define NUM_PARTICLES  100
 
 typedef struct Particle{
 
@@ -19,7 +19,7 @@ typedef struct Particle{
 	double accelerationY; //if considering Gaussian Random Acceleration
 }Particle;
 
-void initialize_particles(Particle particles[NUM_PARTICLES]);
+void initialize_particles(Particle particles[NUM_PARTICLES],int max_x,int min_x,int max_y,int min_y);
 
 void update_particles(Particle particles[NUM_PARTICLES], Measurement measurements[NUM_MEASUREMENTS]);
 

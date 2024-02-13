@@ -49,8 +49,13 @@ void initialize_particles(Particle particles[NUM_PARTICLES]) {
 
 void update_particles(Particle particles[NUM_PARTICLES], Measurement measurements[NUM_MEASUREMENTS]){
 
+<<<<<<< Updated upstream
      double std_x = 0.2; //standard deviation for particle x value - Not sure
      double std_y = 0.2; //standard deviation for particle y value - Not sure
+=======
+      double std_x = 0.2; //standard deviation for particle x value - Not sure
+      double std_y = 0.2; //standard deviation for particle y value - Not sure
+>>>>>>> Stashed changes
      double weight_sum = 0.0; //used for weight normalizing
     double wt =1.0;
      for(int i=0; i<NUM_PARTICLES; i++){
@@ -65,12 +70,28 @@ void update_particles(Particle particles[NUM_PARTICLES], Measurement measurement
                 nearestPointToParticle = measurements[j];
              }
          }
- /*        double numerator = exp(-0.5 * (pow((nearestPointToParticle.x - particles[i].x), 2) / pow(std_x, 2) + pow((nearestPointToParticle.y - particles[i].y), 2) / pow(std_y, 2)));
-         double denominator = 2 * M_PI * std_x * std_y;
+         //--------------------------Gaussian PDF-------------------
 
-        printf("num=%f, denom = %f",numerator,denominator);*/
+//         double numerator = exp(-0.5 * (pow((nearestPointToParticle.x - particles[i].x), 2) / pow(std_x, 2) + pow((nearestPointToParticle.y - particles[i].y), 2) / pow(std_y, 2)));
+//         double denominator = 2 * M_PI * std_x * std_y;
+//
+//        printf("num=%f, denom = %f",numerator,denominator);
+
+       //--------------------------Euclidean Distance-------------------
+
+//        double numerator =1;
+//        double denominator = sqrt(pow((nearestPointToParticle.x - particles[i].x), 2) + pow((nearestPointToParticle.y - particles[i].y), 2));
+//        printf("num=%f, denom = %f",numerator,denominator);
+
+
+//-------------------------------Inverse Distance weighting------------------------------------
+
         double numerator =1;
+<<<<<<< Updated upstream
         double denominator = sqrt(pow((nearestPointToParticle.x - particles[i].x), 2) + pow((nearestPointToParticle.y - particles[i].y), 2));
+=======
+        double denominator = pow(sqrt(pow((nearestPointToParticle.x - particles[i].x), 2) + pow((nearestPointToParticle.y - particles[i].y), 2)),3);
+>>>>>>> Stashed changes
         printf("num=%f, denom = %f",numerator,denominator);
         wt *= (numerator/denominator);
         p->weight = wt;
@@ -100,7 +121,8 @@ void prediction(Particle particles[NUM_PARTICLES]){
     double std_y = 1.5; //standard deviation for particle y value
     double time =0.1; //time = 1 sec as we got the std_dev value based on human speed that is measured in seconds
 
-    //-----------------------Gaussian Random Acceleratioon-----------------------------------------
+    //-----------------------Gaussian Random Acceleration-----------------------------------------
+
         for(int i=0; i<NUM_PARTICLES; ++i){
             Particle *p = &particles[i]; // get address of particle to update
 
@@ -126,6 +148,7 @@ void prediction(Particle particles[NUM_PARTICLES]){
 
         }
     //--------------------basic form of the Newtonian motion-------------------------
+
 //            for (int i = 0; i < NUM_PARTICLES; ++i) {
 //                    Particle *p = &particles[i];
 //
@@ -141,6 +164,20 @@ void prediction(Particle particles[NUM_PARTICLES]){
 //                    p->x = clamp(p->x, -BLE_RANGE, BLE_RANGE);
 //                    p->y = clamp(p->y, -BLE_RANGE, BLE_RANGE);
 //                }
+
+//---------------------------------Random walk----------------------------------------
+
+//        for (int i = 0; i < NUM_PARTICLES; ++i) {
+//                Particle *p = &particles[i];
+//
+//                // Generate a random step from Gaussian distribution for both x and y
+//                double step_x = generate_normal_random(0, std_x);
+//                double step_y = generate_normal_random(0, std_y);
+//
+//                // Update the particle's positio    n
+//                p->x += step_x;
+//                p->y += step_y;
+//            }
 
 }
 
@@ -242,6 +279,7 @@ void estimate(Particle particles[NUM_PARTICLES],double coordinates[2]){
     coordinates[1] = estimated_position.y ;
 
 }
+
 
 
 

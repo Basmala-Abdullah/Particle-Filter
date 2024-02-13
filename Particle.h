@@ -5,7 +5,11 @@
 #include "helper_function.h"
 #include "measurement.h"
 
+<<<<<<< Updated upstream
 #define NUM_PARTICLES  10
+=======
+#define NUM_PARTICLES  25
+>>>>>>> Stashed changes
 
 typedef struct Particle{
 

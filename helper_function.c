@@ -20,3 +20,8 @@ double generate_normal_random(double mean, double stddev) {
     return mean + stddev * u * mul;
 }
 
+double rand_double_range(double min, double max) {
+    return min + (rand() / (RAND_MAX / (max - min)));
+}
+
+

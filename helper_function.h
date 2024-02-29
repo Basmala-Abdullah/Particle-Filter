@@ -9,9 +9,14 @@
 #include <math.h>
 #include <time.h>    
 
-#define NUM_ITERATIONS 50
+#define NUM_ITERATIONS 10
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
 double generate_normal_random(double mean, double stddev);
+double rand_double_range(double min, double max);
 
 
 #endif /* HELPER_FUNCTION_H_ */

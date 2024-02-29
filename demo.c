@@ -171,7 +171,7 @@ void initialize_particles(Particle particles[NUM_PARTICLES]) {
     float mean_x = CAR_LENGTH / 2.0; // Assuming the car is centered at this point
     float mean_y = MAX_DISTANCE / 2.0; // Assuming device approaches from the front
     float stddev_x = CAR_LENGTH / 2.0; // Broader distribution across the car's width
-    float stddev_y = MAX_DISTANCE / 3.0; // Broader distribution as device could be up to 50 meters away
+    float stddev_y = MAX_DISTANCE / 3.0; // Broader distribution as device could be up toï¿½50ï¿½metersï¿½away
 
 
 
@@ -186,3 +186,5 @@ void initialize_particles(Particle particles[NUM_PARTICLES]) {
 }}
 */
 ///////////////////
+
+

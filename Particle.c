@@ -6,7 +6,7 @@
  */
 
  #include "Particle.h"
- #define BLE_RANGE 50
+
 
 //// Add a function to clamp values within a range
 //double clamp(double value, double min, double max) {
@@ -15,12 +15,20 @@
 //    return value;
 //}
 
+
+
 void initialize_particles(Particle particles[NUM_PARTICLES],int max_x,int min_x,int max_y,int min_y) {
 
-    double mean_x = (max_x + min_x)/2; // spread particles in region of measurements (x)
-    double mean_y = (max_y + min_y)/2; // spread particles in region of measurements (y)
-    double stddev_x = (max_x - min_x)/4; // approximate equation of standard deviation value knowing min and max values (x)
-    double stddev_y = (max_y- min_y)/4; // approximate equation of standard deviation value knowing min and max values (y)
+    // double mean_x = (max_x + min_x)/2.0; // spread particles in region of measurements (x)
+    // double mean_y = (max_y + min_y)/2.0; // spread particles in region of measurements (y)
+    // double stddev_x = (max_x - min_x)/4.0; // approximate equation of standard deviation value knowing min and max values (x)
+    // double stddev_y = (max_y- min_y)/4.0; // approximate equation of standard deviation value knowing min and max values (y)
+    
+    double mean_x = 0; // Assuming the car is centered at origin
+    double mean_y = 0; // Assuming the car is centered at origin
+    double stddev_x = BLE_RANGE; // Broader distribution across the car's width
+    double stddev_y = BLE_RANGE; // Broader distribution as device could be up to 50 meters away
+    
     double count = 0;
     for (int i = 0; i < NUM_PARTICLES; i++) {
         do {
@@ -39,6 +47,16 @@ void initialize_particles(Particle particles[NUM_PARTICLES],int max_x,int min_x,
         if(particles[i].x >60 || particles[i].y>60){
             count++;
         }
+
+        // FILE *fp = fopen("init.txt", "w");
+        // if (fp == NULL) {
+        //     printf("Error opening file!\n");
+        //     return;
+        // }
+        // for (int i = 0; i < NUM_PARTICLES; i++) {
+        //     fprintf(fp, "%f %f\n", particles[i].x, particles[i].y);
+        // }
+        // fclose(fp);
     }
     printf("Out of range particles: %f percentage \n", (count/NUM_PARTICLES)*100);
 
@@ -48,41 +66,49 @@ void initialize_particles(Particle particles[NUM_PARTICLES],int max_x,int min_x,
 
 void update_particles(Particle particles[NUM_PARTICLES], Measurement measurements[NUM_MEASUREMENTS]){
 
-    //  double std_x = 0.2; //standard deviation for particle x value - Not sure
-    //  double std_y = 0.2; //standard deviation for particle y value - Not sure
-     double weight_sum = 0.0; //used for weight normalizing
+    double std_x = 1.1; //standard deviation for particle x value
+    double std_y = 1.1; //standard deviation for particle y value
+    double weight_sum = 0.0; //used for weight normalizing
     double wt =1.0;
-     for(int i=0; i<NUM_PARTICLES; i++){
-         Particle *p = &particles[i];
-         wt = 1.0;
-         double distance_min = DBL_MAX;
-         Measurement nearestPointToParticle;
-         for(int j=0; j<NUM_MEASUREMENTS; j++){
-             double distance = sqrt(pow((measurements[j].x-particles[i].x),2)+pow((measurements[j].y-particles[i].y),2)); //Euclidean distance equation
-             if(distance < distance_min){
+    for(int i=0; i<NUM_PARTICLES; i++){
+        Particle *p = &particles[i];
+        wt = 1.0;
+        double distance_min = DBL_MAX;
+        Measurement nearestPointToParticle;
+        for(int j=0; j<NUM_MEASUREMENTS; j++){
+            double distance = sqrt(pow((measurements[j].x-particles[i].x),2)+pow((measurements[j].y-particles[i].y),2)); //Euclidean distance equation
+            if(distance < distance_min){
                 distance_min= distance;
                 nearestPointToParticle = measurements[j];
-             }
-         }
- /*        double numerator = exp(-0.5 * (pow((nearestPointToParticle.x - particles[i].x), 2) / pow(std_x, 2) + pow((nearestPointToParticle.y - particles[i].y), 2) / pow(std_y, 2)));
-         double denominator = 2 * M_PI * std_x * std_y;
+            }
+        }
 
-        printf("num=%f, denom = %f",numerator,denominator);*/
-        double numerator =1;
-        double denominator = sqrt(pow((nearestPointToParticle.x - particles[i].x), 2) + pow((nearestPointToParticle.y - particles[i].y), 2));
-        //printf("num=%f, denom = %f",numerator,denominator);
+        /////////////---------------Gaussian PDF Weighting Strategy---------------/////////////
+        double numerator = exp(-0.5 * (pow((nearestPointToParticle.x - particles[i].x), 2) / pow(std_x, 2) + pow((nearestPointToParticle.y - particles[i].y), 2) / pow(std_y, 2)));
+        double denominator = 2 * acos(-1) * std_x * std_y;
+        printf("num=%f, denom = %f",numerator,denominator);
+
+        /////////////---------------Euclidean Distance Weighting Strategy---------------/////////////
+        // double numerator =1;
+        // double denominator = sqrt(pow((nearestPointToParticle.x - particles[i].x), 2) + pow((nearestPointToParticle.y - particles[i].y), 2));
+        // printf("num=%f, denom = %f",numerator,denominator);
+
+        /////////////---------------Inverse Distance Weighting Strategy---------------/////////////
+        // double numerator =1;
+        // double denominator = pow(sqrt(pow((nearestPointToParticle.x - particles[i].x), 2) + pow((nearestPointToParticle.y - particles[i].y), 2)),2);
+        // printf("num=%f, denom = %f",numerator,denominator);
+
         wt *= (numerator/denominator);
         p->weight = wt;
         weight_sum += wt;
 
         printf("Particle %d: x = %f, y = %f, weight: %f\n", i, particles[i].x, particles[i].y,particles[i].weight);
-     }
+    }
 
-     //Normalize Weights
+    //Normalize Weights
     for (int i = 0; i < NUM_PARTICLES; i++) {
         Particle *p = &particles[i];
         p->weight /= weight_sum;
-
     }
     double total_weight=0;
     for (int i = 0; i < NUM_PARTICLES; i++) {
@@ -95,11 +121,10 @@ void update_particles(Particle particles[NUM_PARTICLES], Measurement measurement
 
 
 void prediction(Particle particles[NUM_PARTICLES]){
+    /////////////---------------Gaussian Random Acceleration---------------/////////////
     double std_x = 1.5; //standard deviation for particle x value
     double std_y = 1.5; //standard deviation for particle y value
     double time =0.1; //time = 1 sec as we got the std_dev value based on human speed that is measured in seconds
-
-    //-----------------------Gaussian Random Acceleratioon-----------------------------------------
         for(int i=0; i<NUM_PARTICLES; ++i){
             Particle *p = &particles[i]; // get address of particle to update
 
@@ -124,6 +149,25 @@ void prediction(Particle particles[NUM_PARTICLES]){
             p->accelerationY = new_acc_y;
 
         }
+
+    /////////////---------------Random Walk---------------/////////////
+    //Parameters for Random Walk
+    // double step_size_max_x = 1.0; // Max step size in x direction
+    // double step_size_max_y = 1.0; // Max step size in y direction
+
+    // for(int i = 0; i < NUM_PARTICLES; ++i) {
+    //     Particle *p = &particles[i]; // Get address of particle to update
+
+    //     // Generate random step in both directions
+    //     double step_x = rand_double_range(-step_size_max_x, step_size_max_x);
+    //     double step_y = rand_double_range(-step_size_max_y, step_size_max_y);
+
+    //     // Update positions with random step
+    //     p->x += step_x;
+    //     p->y += step_y;
+    // }
+
+
     //--------------------basic form of the Newtonian motion-------------------------
 //            for (int i = 0; i < NUM_PARTICLES; ++i) {
 //                    Particle *p = &particles[i];

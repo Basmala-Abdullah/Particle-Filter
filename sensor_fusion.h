@@ -9,7 +9,8 @@
 //strcture that represents single element of array that is recieved from CAN_DB
 typedef struct object_list
 {
-    int anchorId;
+    int deviceId;
+	int anchorId;
     int cycleId;
 	int type;
 	double angle;

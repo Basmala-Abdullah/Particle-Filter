@@ -64,29 +64,47 @@ void initialize_particles(Particle particles[NUM_PARTICLES],int max_x,int min_x,
 }
 
 
-void update_particles(Particle particles[NUM_PARTICLES], Measurement measurements[NUM_MEASUREMENTS]){
+void update_particles(Particle particles[NUM_PARTICLES], Measurement_Type measurements[NUM_MEASUREMENTS]){
 
-    double std_x = 1.1; //standard deviation for particle x value
-    double std_y = 1.1; //standard deviation for particle y value
+    double std_x; //init for standard deviation for particle x value
+    double std_y; //init for standard deviation for particle y value
     double weight_sum = 0.0; //used for weight normalizing
     double wt =1.0;
     for(int i=0; i<NUM_PARTICLES; i++){
         Particle *p = &particles[i];
         wt = 1.0;
         double distance_min = DBL_MAX;
-        Measurement nearestPointToParticle;
+        Measurement_Type nearestPointToParticle;
+        Measurement_Type *measurePointer = &nearestPointToParticle;
+        
         for(int j=0; j<NUM_MEASUREMENTS; j++){
             double distance = sqrt(pow((measurements[j].x-particles[i].x),2)+pow((measurements[j].y-particles[i].y),2)); //Euclidean distance equation
             if(distance < distance_min){
                 distance_min= distance;
-                nearestPointToParticle = measurements[j];
+                nearestPointToParticle.x= measurements[j].x;
+                nearestPointToParticle.y= measurements[j].y;
+                nearestPointToParticle.type= measurements[j].type;
             }
         }
 
         /////////////---------------Gaussian PDF Weighting Strategy---------------/////////////
-        double numerator = exp(-0.5 * (pow((nearestPointToParticle.x - particles[i].x), 2) / pow(std_x, 2) + pow((nearestPointToParticle.y - particles[i].y), 2) / pow(std_y, 2)));
-        double denominator = 2 * acos(-1) * std_x * std_y;
-        printf("num=%f, denom = %f",numerator,denominator);
+        // nearestPointToParticle.type=2;
+        // if(nearestPointToParticle.type==0){
+        //     std_x = 2.0;
+        //     std_y = 2.0;
+
+        // }else if(nearestPointToParticle.type==1){
+        //     std_x = 1.5;
+        //     std_y=1.5;
+
+        // }else if(nearestPointToParticle.type==2){
+        //     std_x = 1.0;
+        //     std_y=1.0;
+        // }
+
+        // double numerator = exp(-0.5 * (pow((nearestPointToParticle.x - particles[i].x), 2) / pow(std_x, 2) + pow((nearestPointToParticle.y - particles[i].y), 2) / pow(std_y, 2)));
+        // double denominator = 2 * M_PI * std_x * std_y;
+        // printf("num=%f, denom = %f, nearestPoint X: %f, nearestPoint Y: %f ",numerator,denominator,nearestPointToParticle.x,nearestPointToParticle.y);
 
         /////////////---------------Euclidean Distance Weighting Strategy---------------/////////////
         // double numerator =1;
@@ -94,9 +112,19 @@ void update_particles(Particle particles[NUM_PARTICLES], Measurement measurement
         // printf("num=%f, denom = %f",numerator,denominator);
 
         /////////////---------------Inverse Distance Weighting Strategy---------------/////////////
-        // double numerator =1;
-        // double denominator = pow(sqrt(pow((nearestPointToParticle.x - particles[i].x), 2) + pow((nearestPointToParticle.y - particles[i].y), 2)),2);
-        // printf("num=%f, denom = %f",numerator,denominator);
+        double power = 0;
+        if(nearestPointToParticle.type==0){
+            power =2.0;
+
+        }else if(nearestPointToParticle.type==1){
+            power =1.0;
+
+        }else if(nearestPointToParticle.type==2){
+            power =0.5;
+        }
+         double numerator =1;
+         double denominator = pow(sqrt(pow((nearestPointToParticle.x - particles[i].x), 2) + pow((nearestPointToParticle.y - particles[i].y), 2)),power);
+         printf("num=%f, denom = %f, nearestPoint X: %f, nearestPoint Y: %f ",numerator,denominator,nearestPointToParticle.x,nearestPointToParticle.y);
 
         wt *= (numerator/denominator);
         p->weight = wt;

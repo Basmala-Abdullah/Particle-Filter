@@ -1,6 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "Particle.h"
+#include "sensor_fusion.h"
+
+
+object_list arr_object_list[NUM_OF_ANCHORS];
+
 
 void plot_particles(Particle particles[], int num_particles, const char* title) {
     FILE *gnuplotPipe = popen("gnuplot -persistent", "w");
@@ -49,9 +54,42 @@ void plot_final_estimation(double x, double y, const char* title) {
 
 int main()
 {
+    
+    //First Anchor
+    arr_object_list[0].deviceId = 15;
+    arr_object_list[0].anchorId =0x123;
+    arr_object_list[0].cycleId = 0;
+    arr_object_list[0].type = 0;
+    arr_object_list[0].angle= 1.2;
+    arr_object_list[0].distance = 21;
+    arr_object_list[0].confidence=0.5;
+    arr_object_list[0].mesgId=0;
+
+    //Second Anchor
+    arr_object_list[1].deviceId = 15;
+    arr_object_list[1].anchorId =0x123;
+    arr_object_list[1].cycleId = 0;
+    arr_object_list[1].type = 0;
+    arr_object_list[1].angle= 1.0;
+    arr_object_list[1].distance = 30;
+    arr_object_list[1].confidence=0.5;
+    arr_object_list[1].mesgId=0;
+
+    //Third Anchor
+    arr_object_list[2].deviceId = 15;
+    arr_object_list[2].anchorId =0x123;
+    arr_object_list[2].cycleId = 0;
+    arr_object_list[2].type = 0;
+    arr_object_list[2].angle= 1.6;
+    arr_object_list[2].distance = 40;
+    arr_object_list[2].confidence=0.5;
+    arr_object_list[2].mesgId=0;
+
+    calculateAvgDevicePosition(arr_object_list);
+
     Particle particles[NUM_PARTICLES];
     FILE *file;
-    Measurement measurements[NUM_MEASUREMENTS]; // Change 100 to the maximum number of lines you expect
+    Measurement_Type measurements[NUM_MEASUREMENTS]; // Change 100 to the maximum number of lines you expect
     int count = 0;
     //The init function takes the boundries of measurements values (min and max value in measurements)
     int min_x = 51;
@@ -60,14 +98,14 @@ int main()
     int max_y = -51;
 
     // Open the file
-    file = fopen("LocalizationData.txt", "r");
+    file = fopen("LocalizationData2.txt", "r");
     if (file == NULL) {
         perror("Error opening file");
         return -1;
     }
 
     // Read the file
-    while (fscanf(file, "%lf %lf", &measurements[count].x, &measurements[count].y) == 2) {
+    while (fscanf(file, "%lf %lf %d", &measurements[count].x, &measurements[count].y,  &measurements[count].type) == 3) {
         //measuring the minimum and maximum values of measurements
        if(measurements[count].x > max_x){
             max_x = measurements[count].x;
@@ -82,9 +120,9 @@ int main()
             min_y = measurements[count].y;
        }
         count++;
-        if (count > NUM_MEASUREMENTS) { // Change 100 to the same number above
-            break;
-        }
+        // if (count > NUM_MEASUREMENTS) { // Change 100 to the same number above
+        //     break;
+        // }
     }
 
     // Close the file

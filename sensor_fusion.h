@@ -15,14 +15,12 @@ typedef struct object_list
 	int type;
 	double angle;
 	double distance;
-	double accuracy;
 	double confidence;
 	int mesgId;
 }object_list;
 
 Measurement calculateDevicePosition(double anchorX, double anchorY, double distance, double angleRadians);
 void calculateAvgDevicePosition(object_list arr_object_list[NUM_OF_ANCHORS]);
-
 
 
 #endif /* SENSOR_FUSION_H_ */

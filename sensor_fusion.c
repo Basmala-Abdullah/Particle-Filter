@@ -13,7 +13,7 @@ Measurement calculateDevicePosition(double anchorX, double anchorY, double dista
 
 void calculateAvgDevicePosition(object_list arr_object_list[NUM_OF_ANCHORS]){
     int numberOfMeasurements =0;
-    Measurement deviceAvgPosition;
+    Measurement_Type deviceAvgPosition;
     deviceAvgPosition.x=0;
     deviceAvgPosition.y=0;
 
@@ -45,6 +45,8 @@ void calculateAvgDevicePosition(object_list arr_object_list[NUM_OF_ANCHORS]){
             deviceAvgPosition.x+=devicePosition.x;
             deviceAvgPosition.y+=devicePosition.y;
             numberOfMeasurements++;
+
+            deviceAvgPosition.type = p->type;
         }
     }
 
@@ -55,7 +57,7 @@ void calculateAvgDevicePosition(object_list arr_object_list[NUM_OF_ANCHORS]){
     }
 
     // Open the file in append mode ("a")
-    FILE *fptr = fopen("output.txt", "a");
+    FILE *fptr = fopen("LocalizationData2.txt", "a");
 
     if (fptr == NULL) {
         printf("Error opening file!\n");
@@ -63,7 +65,7 @@ void calculateAvgDevicePosition(object_list arr_object_list[NUM_OF_ANCHORS]){
     }
 
     // Write the value to the file
-    fprintf(fptr, "%f, %f\n", deviceAvgPosition.x, deviceAvgPosition.y);
+    fprintf(fptr, "%f %f %d\n", deviceAvgPosition.x, deviceAvgPosition.y,deviceAvgPosition.type);
 
     // Close the file
     fclose(fptr);

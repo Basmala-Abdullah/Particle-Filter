@@ -5,7 +5,7 @@
 #include "helper_function.h"
 #include "measurement.h"
 
-#define NUM_PARTICLES  50
+#define NUM_PARTICLES  10
  #define BLE_RANGE 20
  #define PLOT_GRAPH 0
 
@@ -23,7 +23,7 @@ typedef struct Particle{
 
 void initialize_particles(Particle particles[NUM_PARTICLES],int max_x,int min_x,int max_y,int min_y);
 
-void update_particles(Particle particles[NUM_PARTICLES], Measurement measurements[NUM_MEASUREMENTS]);
+void update_particles(Particle particles[NUM_PARTICLES], Measurement_Type measurements[NUM_MEASUREMENTS]);
 
 void prediction(Particle particles[NUM_PARTICLES]);
 

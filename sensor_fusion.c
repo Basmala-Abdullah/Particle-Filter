@@ -17,37 +17,42 @@ void calculateAvgDevicePosition(object_list arr_object_list[NUM_OF_ANCHORS]){
     deviceAvgPosition.x=0;
     deviceAvgPosition.y=0;
 
+    double totalConfidence = 0; // Total confidence for normalization
+
     //Dummy Values of recieved angles and distances
     //each index referes to anchor 1,2,3 respectively
     // double distances[3] = {3,4,5};
     // double angles[3] = {0.9,1,1.2};
 
-    Measurement anchorCoordinates[NUM_OF_ANCHORS];
-
-    //First anchor coordinates
-    anchorCoordinates[0].x=-0.2704;
-    anchorCoordinates[0].y=0.26;
-
-    //Second anchor coordinates
-    anchorCoordinates[1].x=-0.2704;
-    anchorCoordinates[1].y=-0.26;
-
-    //Third anchor coordinates
-    anchorCoordinates[2].x=-0.2704;
-    anchorCoordinates[2].y=0;
+    // Anchor coordinates
+    Measurement anchorCoordinates[NUM_OF_ANCHORS] = {
+        {-0.2704, 0.26},    // First anchor coordinates
+        {-0.2704, -0.26},   // Second anchor coordinates
+        {-0.2704, 0}        // Third anchor coordinates
+    };
 
     for(int i=0;i<NUM_OF_ANCHORS; i++){
         object_list *p = &arr_object_list[i];
         if(p!=NULL){
+            
+            double weight = p->confidence; // Weight based on confidence
+
             Measurement devicePosition = calculateDevicePosition(anchorCoordinates[i].x,anchorCoordinates[i].y,arr_object_list[i].distance,arr_object_list[i].angle);
+
+            // Update total confidence
+            totalConfidence += weight;
+
             deviceAvgPosition.x+=devicePosition.x;
             deviceAvgPosition.y+=devicePosition.y;
             numberOfMeasurements++;
         }
-   
     }
-    deviceAvgPosition.x/=(double)numberOfMeasurements;
-    deviceAvgPosition.y/=(double)numberOfMeasurements;
+
+    // Normalize the average position by the total confidence
+    if (totalConfidence > 0) {
+        deviceAvgPosition.x /= totalConfidence;
+        deviceAvgPosition.y /= totalConfidence;
+    }
 
     // Open the file in append mode ("a")
     FILE *fptr = fopen("output.txt", "a");

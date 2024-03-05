@@ -34,7 +34,7 @@ void initialize_particles(Particle particles[NUM_PARTICLES],int max_x,int min_x,
         do {
             particles[i].x = generate_normal_random(mean_x, stddev_x);
             particles[i].y = generate_normal_random(mean_y, stddev_y);
-        } while (fabs(particles[i].x) > BLE_RANGE || fabs(particles[i].y) > BLE_RANGE);
+        }while (fabs(particles[i].x) > BLE_RANGE || fabs(particles[i].y) > BLE_RANGE);
 
         particles[i].weight = 1.0 / NUM_PARTICLES; // Initialize weights evenly
         particles[i].accelerationX =generate_normal_random(0, 1.5); //as the standard deviation value in prediction step
@@ -88,23 +88,23 @@ void update_particles(Particle particles[NUM_PARTICLES], Measurement_Type measur
         }
 
         /////////////---------------Gaussian PDF Weighting Strategy---------------/////////////
-        // nearestPointToParticle.type=2;
-        // if(nearestPointToParticle.type==0){
-        //     std_x = 2.0;
-        //     std_y = 2.0;
+        //nearestPointToParticle.type=0;
+        if(nearestPointToParticle.type==0){
+            std_x = 2.0;
+            std_y = 2.0;
 
-        // }else if(nearestPointToParticle.type==1){
-        //     std_x = 1.5;
-        //     std_y=1.5;
+        }else if(nearestPointToParticle.type==1){
+            std_x = 1.5;
+            std_y=1.5;
 
-        // }else if(nearestPointToParticle.type==2){
-        //     std_x = 1.0;
-        //     std_y=1.0;
-        // }
+        }else if(nearestPointToParticle.type==2){
+            std_x = 1.0;
+            std_y=1.0;
+        }
 
-        // double numerator = exp(-0.5 * (pow((nearestPointToParticle.x - particles[i].x), 2) / pow(std_x, 2) + pow((nearestPointToParticle.y - particles[i].y), 2) / pow(std_y, 2)));
-        // double denominator = 2 * M_PI * std_x * std_y;
-        // printf("num=%f, denom = %f, nearestPoint X: %f, nearestPoint Y: %f ",numerator,denominator,nearestPointToParticle.x,nearestPointToParticle.y);
+        double numerator = exp(-0.5 * (pow((nearestPointToParticle.x - particles[i].x), 2) / pow(std_x, 2) + pow((nearestPointToParticle.y - particles[i].y), 2) / pow(std_y, 2)));
+        double denominator = 2 * M_PI * std_x * std_y;
+        printf("num=%f, denom = %f, nearestPoint X: %f, nearestPoint Y: %f ",numerator,denominator,nearestPointToParticle.x,nearestPointToParticle.y);
 
         /////////////---------------Euclidean Distance Weighting Strategy---------------/////////////
         // double numerator =1;
@@ -112,19 +112,20 @@ void update_particles(Particle particles[NUM_PARTICLES], Measurement_Type measur
         // printf("num=%f, denom = %f",numerator,denominator);
 
         /////////////---------------Inverse Distance Weighting Strategy---------------/////////////
-        double power = 0;
-        if(nearestPointToParticle.type==0){
-            power =2.0;
+//         double power = 0;
+// //        nearestPointToParticle.type=0;
+//         if(nearestPointToParticle.type==0){
+//             power =2.0;
 
-        }else if(nearestPointToParticle.type==1){
-            power =1.0;
+//         }else if(nearestPointToParticle.type==1){
+//             power =1.0;
 
-        }else if(nearestPointToParticle.type==2){
-            power =0.5;
-        }
-         double numerator =1;
-         double denominator = pow(sqrt(pow((nearestPointToParticle.x - particles[i].x), 2) + pow((nearestPointToParticle.y - particles[i].y), 2)),power);
-         printf("num=%f, denom = %f, nearestPoint X: %f, nearestPoint Y: %f ",numerator,denominator,nearestPointToParticle.x,nearestPointToParticle.y);
+//         }else if(nearestPointToParticle.type==2){
+//             power =0.5;
+//         }
+//          double numerator =1;
+//          double denominator = pow(sqrt(pow((nearestPointToParticle.x - particles[i].x), 2) + pow((nearestPointToParticle.y - particles[i].y), 2)),power);
+//          printf("num=%f, denom = %f, nearestPoint X: %f, nearestPoint Y: %f ",numerator,denominator,nearestPointToParticle.x,nearestPointToParticle.y);
 
         wt *= (numerator/denominator);
         p->weight = wt;

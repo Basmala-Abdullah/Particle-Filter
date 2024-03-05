@@ -61,7 +61,7 @@ int main()
     arr_object_list[0].cycleId = 0;
     arr_object_list[0].type = 0;
     arr_object_list[0].angle= 1.2;
-    arr_object_list[0].distance = 21;
+    arr_object_list[0].distance = 5;
     arr_object_list[0].confidence=0.5;
     arr_object_list[0].mesgId=0;
 
@@ -71,7 +71,7 @@ int main()
     arr_object_list[1].cycleId = 0;
     arr_object_list[1].type = 0;
     arr_object_list[1].angle= 1.0;
-    arr_object_list[1].distance = 30;
+    arr_object_list[1].distance = 10;
     arr_object_list[1].confidence=0.5;
     arr_object_list[1].mesgId=0;
 
@@ -81,7 +81,7 @@ int main()
     arr_object_list[2].cycleId = 0;
     arr_object_list[2].type = 0;
     arr_object_list[2].angle= 1.6;
-    arr_object_list[2].distance = 40;
+    arr_object_list[2].distance = 15;
     arr_object_list[2].confidence=0.5;
     arr_object_list[2].mesgId=0;
 
@@ -89,7 +89,7 @@ int main()
 
     Particle particles[NUM_PARTICLES];
     FILE *file;
-    Measurement_Type measurements[NUM_MEASUREMENTS]; // Change 100 to the maximum number of lines you expect
+    Measurement_Type measurements[NUM_MEASUREMENTS]; 
     int count = 0;
     //The init function takes the boundries of measurements values (min and max value in measurements)
     int min_x = 51;

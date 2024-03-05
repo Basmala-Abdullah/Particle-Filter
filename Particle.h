@@ -5,7 +5,7 @@
 #include "helper_function.h"
 #include "measurement.h"
 
-#define NUM_PARTICLES  10
+#define NUM_PARTICLES  50
  #define BLE_RANGE 20
  #define PLOT_GRAPH 0
 

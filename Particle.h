@@ -11,17 +11,16 @@
 
 typedef struct Particle{
 
-	int id;
-	double x;
-	double y;
-	double weight;
-	double velocityX;     //if considering Gaussian Random Acceleration
-	double accelerationX; //if considering Gaussian Random Acceleration
-	double velocityY;     //if considering Gaussian Random Acceleration
-	double accelerationY; //if considering Gaussian Random Acceleration
+	float x;
+	float y;
+	float weight;
+	float velocityX;     //if considering Gaussian Random Acceleration
+	float accelerationX; //if considering Gaussian Random Acceleration
+	float velocityY;     //if considering Gaussian Random Acceleration
+	float accelerationY; //if considering Gaussian Random Acceleration
 }Particle;
 
-void initialize_particles(Particle particles[NUM_PARTICLES],int max_x,int min_x,int max_y,int min_y);
+void initialize_particles(Particle particles[NUM_PARTICLES]);
 
 void update_particles(Particle particles[NUM_PARTICLES], Measurement_Type measurements[NUM_MEASUREMENTS]);
 
@@ -29,8 +28,7 @@ void prediction(Particle particles[NUM_PARTICLES]);
 
 void resample(Particle particles[NUM_PARTICLES]);
 
-void estimate(Particle particles[NUM_PARTICLES],double coordinates[2]);
+void estimate(Particle particles[NUM_PARTICLES],float coordinates[2]);
 
 #endif /* PARTICLE_H_ */
-
 

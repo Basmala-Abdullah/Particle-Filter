@@ -9,7 +9,7 @@
 
 
 //// Add a function to clamp values within a range
-//double clamp(double value, double min, double max) {
+//float clamp(float value, float min, float max) {
 //    if (value < min) return min;
 //    if (value > max) return max;
 //    return value;
@@ -17,20 +17,20 @@
 
 
 
-void initialize_particles(Particle particles[NUM_PARTICLES],int max_x,int min_x,int max_y,int min_y) {
+void initialize_particles(Particle particles[NUM_PARTICLES]) {
 
     // double mean_x = (max_x + min_x)/2.0; // spread particles in region of measurements (x)
     // double mean_y = (max_y + min_y)/2.0; // spread particles in region of measurements (y)
     // double stddev_x = (max_x - min_x)/4.0; // approximate equation of standard deviation value knowing min and max values (x)
     // double stddev_y = (max_y- min_y)/4.0; // approximate equation of standard deviation value knowing min and max values (y)
     
-    double mean_x = 0; // Assuming the car is centered at origin
-    double mean_y = 0; // Assuming the car is centered at origin
-    double stddev_x = BLE_RANGE; // Broader distribution across the car's width
-    double stddev_y = BLE_RANGE; // Broader distribution as device could be up to 50 meters away
+    uint8_t mean_x = 0; // Assuming the car is centered at origin
+    uint8_t mean_y = 0; // Assuming the car is centered at origin
+    uint8_t stddev_x = BLE_RANGE; // Broader distribution across the car's width
+    uint8_t stddev_y = BLE_RANGE; // Broader distribution as device could be up to 50 meters away
     
-    double count = 0;
-    for (int i = 0; i < NUM_PARTICLES; i++) {
+    uint32_t count = 0;
+    for (uint32_t i = 0; i < NUM_PARTICLES; i++) {
         do {
             particles[i].x = generate_normal_random(mean_x, stddev_x);
             particles[i].y = generate_normal_random(mean_y, stddev_y);
@@ -58,27 +58,24 @@ void initialize_particles(Particle particles[NUM_PARTICLES],int max_x,int min_x,
         // }
         // fclose(fp);
     }
-    printf("Out of range particles: %f percentage \n", (count/NUM_PARTICLES)*100);
-
-
+    printf("Out of range particles: %f percentage \n", (count/(float)NUM_PARTICLES)*100);
 }
 
 
 void update_particles(Particle particles[NUM_PARTICLES], Measurement_Type measurements[NUM_MEASUREMENTS]){
 
-    double std_x; //init for standard deviation for particle x value
-    double std_y; //init for standard deviation for particle y value
-    double weight_sum = 0.0; //used for weight normalizing
-    double wt =1.0;
-    for(int i=0; i<NUM_PARTICLES; i++){
+    float std_x; //init for standard deviation for particle x value
+    float std_y; //init for standard deviation for particle y value
+    float weight_sum = 0.0; //used for weight normalizing
+    float wt =1.0;
+    for(uint32_t i=0; i<NUM_PARTICLES; i++){
         Particle *p = &particles[i];
         wt = 1.0;
-        double distance_min = DBL_MAX;
+        float distance_min = FLT_MAX;
         Measurement_Type nearestPointToParticle;
-        Measurement_Type *measurePointer = &nearestPointToParticle;
         
-        for(int j=0; j<NUM_MEASUREMENTS; j++){
-            double distance = sqrt(pow((measurements[j].x-particles[i].x),2)+pow((measurements[j].y-particles[i].y),2)); //Euclidean distance equation
+        for(uint32_t j=0; j<NUM_MEASUREMENTS; j++){
+            float distance = sqrt(pow((measurements[j].x-particles[i].x),2)+pow((measurements[j].y-particles[i].y),2)); //Euclidean distance equation
             if(distance < distance_min){
                 distance_min= distance;
                 nearestPointToParticle.x= measurements[j].x;
@@ -102,17 +99,17 @@ void update_particles(Particle particles[NUM_PARTICLES], Measurement_Type measur
             std_y=1.0;
         }
 
-        double numerator = exp(-0.5 * (pow((nearestPointToParticle.x - particles[i].x), 2) / pow(std_x, 2) + pow((nearestPointToParticle.y - particles[i].y), 2) / pow(std_y, 2)));
-        double denominator = 2 * M_PI * std_x * std_y;
+        float numerator = exp(-0.5 * (pow((nearestPointToParticle.x - particles[i].x), 2) / pow(std_x, 2) + pow((nearestPointToParticle.y - particles[i].y), 2) / pow(std_y, 2)));
+        float denominator = 2 * M_PI * std_x * std_y;
         printf("num=%f, denom = %f, nearestPoint X: %f, nearestPoint Y: %f ",numerator,denominator,nearestPointToParticle.x,nearestPointToParticle.y);
 
         /////////////---------------Euclidean Distance Weighting Strategy---------------/////////////
-        // double numerator =1;
-        // double denominator = sqrt(pow((nearestPointToParticle.x - particles[i].x), 2) + pow((nearestPointToParticle.y - particles[i].y), 2));
+        // float numerator =1;
+        // float denominator = sqrt(pow((nearestPointToParticle.x - particles[i].x), 2) + pow((nearestPointToParticle.y - particles[i].y), 2));
         // printf("num=%f, denom = %f",numerator,denominator);
 
         /////////////---------------Inverse Distance Weighting Strategy---------------/////////////
-//         double power = 0;
+//         float power = 0;
 // //        nearestPointToParticle.type=0;
 //         if(nearestPointToParticle.type==0){
 //             power =2.0;
@@ -123,8 +120,8 @@ void update_particles(Particle particles[NUM_PARTICLES], Measurement_Type measur
 //         }else if(nearestPointToParticle.type==2){
 //             power =0.5;
 //         }
-//          double numerator =1;
-//          double denominator = pow(sqrt(pow((nearestPointToParticle.x - particles[i].x), 2) + pow((nearestPointToParticle.y - particles[i].y), 2)),power);
+//          float numerator =1;
+//          float denominator = pow(sqrt(pow((nearestPointToParticle.x - particles[i].x), 2) + pow((nearestPointToParticle.y - particles[i].y), 2)),power);
 //          printf("num=%f, denom = %f, nearestPoint X: %f, nearestPoint Y: %f ",numerator,denominator,nearestPointToParticle.x,nearestPointToParticle.y);
 
         wt *= (numerator/denominator);
@@ -135,12 +132,12 @@ void update_particles(Particle particles[NUM_PARTICLES], Measurement_Type measur
     }
 
     //Normalize Weights
-    for (int i = 0; i < NUM_PARTICLES; i++) {
+    for (uint32_t i = 0; i < NUM_PARTICLES; i++) {
         Particle *p = &particles[i];
         p->weight /= weight_sum;
     }
-    double total_weight=0;
-    for (int i = 0; i < NUM_PARTICLES; i++) {
+    float total_weight=0;
+    for (uint32_t i = 0; i < NUM_PARTICLES; i++) {
 
         total_weight+=particles[i].weight;
 
@@ -151,23 +148,23 @@ void update_particles(Particle particles[NUM_PARTICLES], Measurement_Type measur
 
 void prediction(Particle particles[NUM_PARTICLES]){
     /////////////---------------Gaussian Random Acceleration---------------/////////////
-    double std_x = 1.5; //standard deviation for particle x value
-    double std_y = 1.5; //standard deviation for particle y value
-    double time =0.1; //time = 1 sec as we got the std_dev value based on human speed that is measured in seconds
-        for(int i=0; i<NUM_PARTICLES; ++i){
+    float std_x = 1.5; //standard deviation for particle x value
+    float std_y = 1.5; //standard deviation for particle y value
+    float time =0.1; //time = 1 sec as we got the std_dev value based on human speed that is measured in seconds
+        for(uint32_t i=0; i<NUM_PARTICLES; ++i){
             Particle *p = &particles[i]; // get address of particle to update
 
             //X-direction
-            double errorX = generate_normal_random(0, std_x);
-            double new_acc_x = p->accelerationX + errorX;
-            double new_vel_x = p->velocityX + new_acc_x * time;
-            double new_x = p->x + new_vel_x * time + new_acc_x * time * time;
+            float errorX = generate_normal_random(0, std_x);
+            float new_acc_x = p->accelerationX + errorX;
+            float new_vel_x = p->velocityX + new_acc_x * time;
+            float new_x = p->x + new_vel_x * time + new_acc_x * time * time;
 
             //Y-direction
-            double errorY = generate_normal_random(0, std_y);
-            double new_acc_y = p->accelerationY + errorY;
-            double new_vel_y = p->velocityY + new_acc_y * time;
-            double new_y = p->y + new_vel_y * time + new_acc_y * time * time;
+            float errorY = generate_normal_random(0, std_y);
+            float new_acc_y = p->accelerationY + errorY;
+            float new_vel_y = p->velocityY + new_acc_y * time;
+            float new_y = p->y + new_vel_y * time + new_acc_y * time * time;
 
 
             p->x = new_x;
@@ -181,15 +178,15 @@ void prediction(Particle particles[NUM_PARTICLES]){
 
     /////////////---------------Random Walk---------------/////////////
     //Parameters for Random Walk
-    // double step_size_max_x = 1.0; // Max step size in x direction
-    // double step_size_max_y = 1.0; // Max step size in y direction
+    // float step_size_max_x = 1.0; // Max step size in x direction
+    // float step_size_max_y = 1.0; // Max step size in y direction
 
     // for(int i = 0; i < NUM_PARTICLES; ++i) {
     //     Particle *p = &particles[i]; // Get address of particle to update
 
     //     // Generate random step in both directions
-    //     double step_x = rand_double_range(-step_size_max_x, step_size_max_x);
-    //     double step_y = rand_double_range(-step_size_max_y, step_size_max_y);
+    //     float step_x = rand_double_range(-step_size_max_x, step_size_max_x);
+    //     float step_y = rand_double_range(-step_size_max_y, step_size_max_y);
 
     //     // Update positions with random step
     //     p->x += step_x;
@@ -218,25 +215,25 @@ void prediction(Particle particles[NUM_PARTICLES]){
 
 void resample(Particle particles[NUM_PARTICLES]) {
     Particle resampled_particles[NUM_PARTICLES];
-    double weights[NUM_PARTICLES];
-    double sum_of_weights = 0;
+    float weights[NUM_PARTICLES];
+    float sum_of_weights = 0;
 
     // Calculate sum of weights
-    for (int i = 0; i < NUM_PARTICLES; i++) {
+    for (uint32_t i = 0; i < NUM_PARTICLES; i++) {
         weights[i] = particles[i].weight;
         sum_of_weights += particles[i].weight;
     }
 
     // Generate cumulative weights for sampling
-    for (int i = 1; i < NUM_PARTICLES; i++) {
+    for (uint32_t i = 1; i < NUM_PARTICLES; i++) {
         weights[i] += weights[i - 1];
     }
 
     // Resample
     // srand(time(NULL)); // Seed the random number generator.
-    for (int i = 0; i < NUM_PARTICLES; i++) {
-        double pick = (double)rand() / RAND_MAX * sum_of_weights;
-        for (int j = 0; j < NUM_PARTICLES; j++) {
+    for (uint32_t i = 0; i < NUM_PARTICLES; i++) {
+        float pick = (float)rand() / RAND_MAX * sum_of_weights;
+        for (uint32_t j = 0; j < NUM_PARTICLES; j++) {
             if (pick <= weights[j]) {
                 resampled_particles[i] = particles[j];
                 break;
@@ -245,7 +242,7 @@ void resample(Particle particles[NUM_PARTICLES]) {
     }
 
     // Copy the resampled particles back
-    for (int i = 0; i < NUM_PARTICLES; i++) {
+    for (uint8_t i = 0; i < NUM_PARTICLES; i++) {
         particles[i] = resampled_particles[i];
     }
 
@@ -253,17 +250,17 @@ void resample(Particle particles[NUM_PARTICLES]) {
     //Normalize Weights
     sum_of_weights = 0;
     // Calculate sum of weights
-    for (int i = 0; i < NUM_PARTICLES; i++) {
+    for (uint32_t i = 0; i < NUM_PARTICLES; i++) {
         weights[i] = particles[i].weight;
         sum_of_weights += particles[i].weight;
     }
-    for (int i = 0; i < NUM_PARTICLES; i++) {
+    for (uint32_t i = 0; i < NUM_PARTICLES; i++) {
         Particle *p = &particles[i];
         p->weight /= sum_of_weights;
 
     }
-    double total_weight=0;
-    for (int i = 0; i < NUM_PARTICLES; i++) {
+    float total_weight=0;
+    for (uint32_t i = 0; i < NUM_PARTICLES; i++) {
 
         total_weight+=particles[i].weight;
 
@@ -272,13 +269,13 @@ void resample(Particle particles[NUM_PARTICLES]) {
 }
 
 
-void estimate(Particle particles[NUM_PARTICLES],double coordinates[2]){
+void estimate(Particle particles[NUM_PARTICLES],float coordinates[2]){
 
     //Maximum Weight Particle
 
-    /*double highest_weight = -1.0;
+    /*float highest_weight = -1.0;
     Particle best_particle;
-    for (int i = 0; i < NUM_PARTICLES; ++i){
+    for (uint32_t i = 0; i < NUM_PARTICLES; ++i){
         if (particles[i].weight > highest_weight) {
             highest_weight = particles[i].weight;
             best_particle = particles[i];
@@ -290,11 +287,11 @@ void estimate(Particle particles[NUM_PARTICLES],double coordinates[2]){
     */
 
     //Weighted Average
-    double sum_weights_x = 0;
-    double sum_weights_y = 0;
-    double total_weight = 0;
+    float sum_weights_x = 0;
+    float sum_weights_y = 0;
+    float total_weight = 0;
 
-    for (int i = 0; i < NUM_PARTICLES; i++) {
+    for (uint32_t i = 0; i < NUM_PARTICLES; i++) {
         sum_weights_x += particles[i].x * particles[i].weight;
         sum_weights_y += particles[i].y * particles[i].weight;
         total_weight += particles[i].weight;
@@ -314,7 +311,6 @@ void estimate(Particle particles[NUM_PARTICLES],double coordinates[2]){
     coordinates[1] = estimated_position.y ;
 
 }
-
 
 
 

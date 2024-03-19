@@ -54,10 +54,9 @@ void plot_final_estimation(double x, double y, const char* title) {
 
 int main()
 {
-    
     //First Anchor
     arr_object_list[0].deviceId = 15;
-    arr_object_list[0].anchorId =0x123;
+//    arr_object_list[0].anchorId =0x123;
     arr_object_list[0].cycleId = 0;
     arr_object_list[0].type = 0;
     arr_object_list[0].angle= 1.2;
@@ -67,7 +66,7 @@ int main()
 
     //Second Anchor
     arr_object_list[1].deviceId = 15;
-    arr_object_list[1].anchorId =0x123;
+//    arr_object_list[1].anchorId =0x123;
     arr_object_list[1].cycleId = 0;
     arr_object_list[1].type = 0;
     arr_object_list[1].angle= 1.0;
@@ -77,7 +76,7 @@ int main()
 
     //Third Anchor
     arr_object_list[2].deviceId = 15;
-    arr_object_list[2].anchorId =0x123;
+//    arr_object_list[2].anchorId =0x123;
     arr_object_list[2].cycleId = 0;
     arr_object_list[2].type = 0;
     arr_object_list[2].angle= 1.6;
@@ -90,12 +89,12 @@ int main()
     Particle particles[NUM_PARTICLES];
     FILE *file;
     Measurement_Type measurements[NUM_MEASUREMENTS]; 
-    int count = 0;
+    uint32_t count = 0;
     //The init function takes the boundries of measurements values (min and max value in measurements)
-    int min_x = 51;
-    int min_y = 51;
-    int max_x = -51;
-    int max_y = -51;
+    uint32_t min_x = 51;
+    uint32_t min_y = 51;
+    uint32_t max_x = -51;
+    uint32_t max_y = -51;
 
     // Open the file
     file = fopen("LocalizationData2.txt", "r");
@@ -105,7 +104,7 @@ int main()
     }
 
     // Read the file
-    while (fscanf(file, "%lf %lf %d", &measurements[count].x, &measurements[count].y,  &measurements[count].type) == 3) {
+    while (fscanf(file, "%f %f %d", &measurements[count].x, &measurements[count].y,  &measurements[count].type) == 3) {
         //measuring the minimum and maximum values of measurements
        if(measurements[count].x > max_x){
             max_x = measurements[count].x;
@@ -129,13 +128,13 @@ int main()
     fclose(file);
     printf("Init step: \n");
     //spread particles in region of the recieved measurements
-    initialize_particles(particles, max_x,min_x,max_y,min_y);
+    initialize_particles(particles);
 #if PLOT_GRAPH
     plot_particles(particles, NUM_PARTICLES, "Initial Particle Distribution");
 #endif
 
 
-    for(int k=0; k<NUM_ITERATIONS;k++){
+    for(uint32_t k=0; k<NUM_ITERATIONS;k++){
         printf("Iteration num %d\n",k);
         prediction(particles);
 #if PLOT_GRAPH
@@ -147,7 +146,7 @@ int main()
 
 
         printf("Prediction step: \n");
-        for (int i = 0; i < NUM_PARTICLES; i++) {
+        for (uint32_t i = 0; i < NUM_PARTICLES; i++) {
             printf("Particle %d: x = %f, y = %f\n", i, particles[i].x, particles[i].y);
         }
         printf("Update step: \n");
@@ -166,14 +165,14 @@ int main()
         plot_particles(particles, NUM_PARTICLES, title);
 #endif
 
-            for (int i = 0; i < NUM_PARTICLES; i++) {
+            for (uint32_t i = 0; i < NUM_PARTICLES; i++) {
                 printf("Particle %d: x = %f, y = %f, weight: %f\n", i, particles[i].x, particles[i].y,particles[i].weight);
         }
     }
 
 
     printf("Estimation step: \n");
-    double device_coordinates[2];
+    float device_coordinates[2];
     estimate(particles, device_coordinates);
 #if PLOT_GRAPH
     // Plot final estimation

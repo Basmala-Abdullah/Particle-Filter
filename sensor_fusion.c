@@ -1,6 +1,6 @@
 #include "sensor_fusion.h"
 
-Measurement calculateDevicePosition(double anchorX, double anchorY, double distance, double angleRadians) {
+Measurement calculateDevicePosition(float anchorX, float anchorY, float distance, float angleRadians) {
 
     Measurement devicePosition;
 
@@ -10,14 +10,13 @@ Measurement calculateDevicePosition(double anchorX, double anchorY, double dista
     return devicePosition;
 }
 
-
 void calculateAvgDevicePosition(object_list arr_object_list[NUM_OF_ANCHORS]){
     int numberOfMeasurements =0;
     Measurement_Type deviceAvgPosition;
     deviceAvgPosition.x=0;
     deviceAvgPosition.y=0;
 
-    double totalConfidence = 0; // Total confidence for normalization
+    float totalConfidence = 0; // Total confidence for normalization
 
     //Dummy Values of recieved angles and distances
     //each index referes to anchor 1,2,3 respectively
@@ -35,7 +34,7 @@ void calculateAvgDevicePosition(object_list arr_object_list[NUM_OF_ANCHORS]){
         object_list *p = &arr_object_list[i];
         if(p!=NULL){
             
-            double weight = p->confidence; // Weight based on confidence
+            float weight = p->confidence; // Weight based on confidence
 
             Measurement devicePosition = calculateDevicePosition(anchorCoordinates[i].x,anchorCoordinates[i].y,arr_object_list[i].distance,arr_object_list[i].angle);
 
@@ -70,5 +69,4 @@ void calculateAvgDevicePosition(object_list arr_object_list[NUM_OF_ANCHORS]){
     // Close the file
     fclose(fptr);
 }
-
 

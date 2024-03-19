@@ -1,18 +1,26 @@
 #ifndef    MEASUREMENT_H_
 #define    MEASUREMENT_H_
 
-#define NUM_MEASUREMENTS 136
+#include "std_types.h"
 
+#define NUM_MEASUREMENTS 135
+
+
+enum type_of_ranging_algorithm {
+    Rssi,
+    Tof,
+    ChannelSounding,
+};
 
 typedef struct Measurement {
-    double x;
-    double y;
+    float x;
+    float y;
 } Measurement;
 
 typedef struct Measurement_Type {
-    double x;
-    double y;
-    int type;
+    float x;
+    float y;
+    enum type_of_ranging_algorithm type;
 } Measurement_Type;
 
 

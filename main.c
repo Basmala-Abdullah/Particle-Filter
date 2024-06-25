@@ -54,37 +54,63 @@ void plot_final_estimation(double x, double y, const char* title) {
 
 int main()
 {
+    Measurement_Type devicePos;
+
     //First Anchor
     arr_object_list[0].deviceId = 15;
-//    arr_object_list[0].anchorId =0x123;
     arr_object_list[0].cycleId = 0;
     arr_object_list[0].type = 0;
     arr_object_list[0].angle= 1.2;
-    arr_object_list[0].distance = 5;
+    arr_object_list[0].distance = 2;
     arr_object_list[0].confidence=0.5;
     arr_object_list[0].mesgId=0;
 
     //Second Anchor
     arr_object_list[1].deviceId = 15;
-//    arr_object_list[1].anchorId =0x123;
     arr_object_list[1].cycleId = 0;
     arr_object_list[1].type = 0;
     arr_object_list[1].angle= 1.0;
-    arr_object_list[1].distance = 10;
+    arr_object_list[1].distance = 4;
     arr_object_list[1].confidence=0.5;
     arr_object_list[1].mesgId=0;
 
     //Third Anchor
     arr_object_list[2].deviceId = 15;
-//    arr_object_list[2].anchorId =0x123;
     arr_object_list[2].cycleId = 0;
     arr_object_list[2].type = 0;
     arr_object_list[2].angle= 1.6;
-    arr_object_list[2].distance = 15;
+    arr_object_list[2].distance = 4;
     arr_object_list[2].confidence=0.5;
     arr_object_list[2].mesgId=0;
+    
+    Measurement_Type testing;
+    testing = trilaterate_position(arr_object_list);
+    printf("testing x= %f, y=%f\n", testing.x, testing.y);
 
-    calculateAvgDevicePosition(arr_object_list);
+    enum type_of_ranging_algorithm CheckType;
+    for(uint8_t i =0;i<NUM_OF_ANCHORS;i++){
+        object_list *p = &arr_object_list[i];
+        if(p!=NULL){
+            CheckType=arr_object_list[i].type;
+            break;
+        }
+    }
+    if(CheckType == Rssi || CheckType == Tof){
+        devicePos = trilaterate_position(arr_object_list);
+        printf("x= %f, y=%f\n",devicePos.x,devicePos.y);
+
+        if(devicePos.type!=-1){
+            //call update
+            ;
+        }else{
+            //discard
+            ;
+        }
+    }else if(CheckType == ChannelSounding){
+        calculateAvgDevicePosition(arr_object_list);
+    }else{
+        ;
+    }
 
     Particle particles[NUM_PARTICLES];
     FILE *file;
@@ -96,36 +122,9 @@ int main()
     uint32_t max_x = -51;
     uint32_t max_y = -51;
 
-    // Open the file
-    file = fopen("LocalizationData2.txt", "r");
-    if (file == NULL) {
-        perror("Error opening file");
-        return -1;
-    }
 
-    // Read the file
-    while (fscanf(file, "%f %f %d", &measurements[count].x, &measurements[count].y,  &measurements[count].type) == 3) {
-        //measuring the minimum and maximum values of measurements
-       if(measurements[count].x > max_x){
-            max_x = measurements[count].x;
-       }
-       if(measurements[count].x < min_x){
-            min_x = measurements[count].x;
-       }
-       if(measurements[count].y > max_y){
-            max_y = measurements[count].y;
-       }
-       if(measurements[count].y < min_y){
-            min_y = measurements[count].y;
-       }
-        count++;
-        // if (count > NUM_MEASUREMENTS) { // Change 100 to the same number above
-        //     break;
-        // }
-    }
+    
 
-    // Close the file
-    fclose(file);
     printf("Init step: \n");
     //spread particles in region of the recieved measurements
     initialize_particles(particles);
@@ -150,7 +149,10 @@ int main()
             printf("Particle %d: x = %f, y = %f\n", i, particles[i].x, particles[i].y);
         }
         printf("Update step: \n");
-        update_particles(particles, measurements);
+        // devicePos.x=15.0;
+        // devicePos.y=14.0;
+        // devicePos.type=0;
+        update_particles(particles, devicePos);
 #if PLOT_GRAPH
         // Plot after update
         sprintf(title, "Particle Distribution After Update %d", k);

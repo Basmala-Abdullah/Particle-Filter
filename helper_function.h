@@ -9,7 +9,7 @@
 #include <math.h>
 #include <time.h>    
 #include "std_types.h"
-#define NUM_ITERATIONS 17
+#define NUM_ITERATIONS 15
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
